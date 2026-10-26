@@ -70,7 +70,11 @@ export default function BlogDetailPage({
           <div className="flex items-center gap-4">
             <button
               onClick={onBackHome}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${theme.border} text-xs font-mono hover:bg-slate-800/60 transition-colors`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${theme.border} text-xs font-mono transition-colors ${
+                theme.mode === "light"
+                  ? "hover:bg-slate-100"
+                  : "hover:bg-slate-800/60"
+              }`}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>Back</span>
@@ -98,9 +102,9 @@ export default function BlogDetailPage({
                   <PenTool className="h-3.5 w-3.5" />
                   <span>Write Post</span>
                 </button>
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} bg-slate-900/60 font-mono text-xs`}>
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} ${theme.cardBg} font-mono text-xs`}>
                   <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="font-semibold text-slate-200">@{currentUser.username}</span>
+                  <span className={`font-semibold ${theme.textPrimary}`}>@{currentUser.username}</span>
                 </div>
                 <button
                   onClick={onLogout}
@@ -135,12 +139,12 @@ export default function BlogDetailPage({
       {/* 2. Main Blog Layout */}
       <main className="max-w-7xl mx-auto px-6 py-10 w-full flex-1">
         {loading ? (
-          <div className="text-center py-24 font-mono text-sm text-slate-400">
+          <div className={`text-center py-24 font-mono text-sm ${theme.textSecondary}`}>
             <span className="inline-block h-5 w-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mr-2" />
             Decrypting full hardware datasheet and article...
           </div>
         ) : !blog ? (
-          <div className={`p-12 rounded-2xl border ${theme.border} text-center font-mono text-sm text-slate-400`}>
+          <div className={`p-12 rounded-2xl border ${theme.border} ${theme.cardBg} text-center font-mono text-sm ${theme.textSecondary}`}>
             Article not found. It may have been moved or removed.
           </div>
         ) : (
@@ -150,11 +154,15 @@ export default function BlogDetailPage({
             <article className={`lg:col-span-8 rounded-2xl border ${theme.border} ${theme.cardBg} p-6 sm:p-10 backdrop-blur-md shadow-xl transition-all`}>
               {/* Category & Manufacturer Badges */}
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <span className="text-xs font-mono font-bold px-3 py-1 rounded-md border border-cyan-500/40 bg-cyan-500/10 text-cyan-400 tracking-wider">
+                <span className={`text-xs font-mono font-bold px-3 py-1 rounded-md border tracking-wider ${
+                   theme.mode === "light"
+                     ? "border-cyan-700/30 bg-cyan-50 text-cyan-800"
+                     : "border-cyan-500/40 bg-cyan-500/10 text-cyan-400"
+                 }`}>
                   {blog.categoryName}
                 </span>
-                <div className="flex items-center gap-1.5 text-xs font-mono text-slate-400">
-                  <Building2 className="h-3.5 w-3.5 text-slate-500" />
+                <div className={`flex items-center gap-1.5 text-xs font-mono ${theme.textSecondary}`}>
+                  <Building2 className={`h-3.5 w-3.5 ${theme.textSecondary}`} />
                   <span>{blog.manufacturer}</span>
                 </div>
               </div>
@@ -165,33 +173,39 @@ export default function BlogDetailPage({
               </h1>
 
               {/* Author & Timestamp */}
-              <div className="flex items-center gap-4 pb-6 border-b border-slate-800 text-xs font-mono text-slate-400 mb-6">
+              <div className={`flex items-center gap-4 pb-6 border-b ${theme.border} text-xs font-mono ${theme.textSecondary} mb-6`}>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  Written by <strong className="text-slate-200">@{blog.authorUsername}</strong>
+                  Written by <strong className={theme.textPrimary}>@{blog.authorUsername}</strong>
                 </span>
                 {blog.createdAt && (
                   <span className="flex items-center gap-1">
-                    <Calendar className="h-3.5 w-3.5 text-slate-500" />
+                    <Calendar className={`h-3.5 w-3.5 ${theme.textSecondary}`} />
                     {new Date(blog.createdAt).toLocaleDateString()}
                   </span>
                 )}
               </div>
 
               {/* Target Applications Box */}
-              <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 mb-8 font-mono text-xs">
+              <div className={`p-4 rounded-xl border mb-8 font-mono text-xs ${
+                 theme.mode === "light"
+                   ? "bg-slate-100 border-slate-300"
+                   : "bg-slate-950/60 border-slate-800"
+               }`}>
                 <div className="flex items-center gap-1.5 text-cyan-400 font-semibold mb-1">
                   <Compass className="h-4 w-4" />
                   <span>PRIMARY INDUSTRIAL APPLICATIONS</span>
                 </div>
-                <p className="text-slate-300 leading-relaxed">{blog.primaryUseCases}</p>
+                <p className={`leading-relaxed ${theme.mode === "light" ? "text-slate-700" : "text-slate-300"}`}>{blog.primaryUseCases}</p>
               </div>
 
               {/* Hardware Images Gallery (1 or 2 images) */}
               {blog.imageUrls && blog.imageUrls.length > 0 && (
                 <div className={`grid ${blog.imageUrls.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"} gap-4 mb-8`}>
                   {blog.imageUrls.map((url, idx) => (
-                    <div key={idx} className="rounded-xl overflow-hidden border border-slate-800 bg-slate-950 shadow-md">
+                    <div key={idx} className={`rounded-xl overflow-hidden border ${theme.border} ${
+                       theme.mode === "light" ? "bg-slate-100" : "bg-slate-950"
+                     } shadow-md`}>
                       <img
                         src={url}
                         alt={`${blog.title} spec view ${idx + 1}`}
@@ -204,9 +218,13 @@ export default function BlogDetailPage({
               )}
 
               {/* Complete Unclipped Blog Content */}
-              <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-300 font-sans border-t border-slate-800 pt-6">
-                <h3 className="font-mono text-xs uppercase tracking-widest text-slate-500">Technical Breakdown</h3>
-                <p className="whitespace-pre-line text-slate-200 leading-relaxed font-normal">
+              <div className={`space-y-4 text-sm sm:text-base leading-relaxed font-sans border-t ${theme.border} pt-6 ${
+                 theme.mode === "light" ? "text-slate-700" : "text-slate-300"
+               }`}>
+                <h3 className={`font-mono text-xs uppercase tracking-widest ${theme.textSecondary}`}>Technical Breakdown</h3>
+                <p className={`whitespace-pre-line leading-relaxed font-normal ${
+                   theme.mode === "light" ? "text-slate-900" : "text-slate-200"
+                 }`}>
                   {blog.content}
                 </p>
               </div>
@@ -215,8 +233,8 @@ export default function BlogDetailPage({
               {blog.purchaseLink && (
                 <div className="mt-10 p-5 rounded-xl border border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <h4 className="font-bold text-sm text-slate-100">Verified Sourcing & Distribution</h4>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">Direct link to component datasheets and retail distributors.</p>
+                    <h4 className={`font-bold text-sm ${theme.textPrimary}`}>Verified Sourcing & Distribution</h4>
+                    <p className={`text-xs font-mono mt-0.5 ${theme.textSecondary}`}>Direct link to component datasheets and retail distributors.</p>
                   </div>
                   <a
                     href={blog.purchaseLink}
@@ -234,13 +252,13 @@ export default function BlogDetailPage({
             {/* Right Sidebar: Related Category Write-ups (4 cols) */}
             <aside className="lg:col-span-4 space-y-6">
               <div className={`rounded-2xl border ${theme.border} ${theme.cardBg} p-6 backdrop-blur-md shadow-lg`}>
-                <div className="flex items-center gap-2 pb-4 border-b border-slate-800 mb-5">
+                <div className={`flex items-center gap-2 pb-4 border-b ${theme.border} mb-5`}>
                   <Layers className="h-4 w-4 text-cyan-400" />
                   <h3 className="font-bold text-sm tracking-tight">More in {blog.categoryName}</h3>
                 </div>
 
                 {relatedBlogs.length === 0 ? (
-                  <p className="font-mono text-xs text-slate-500 py-4 text-center">
+                  <p className={`font-mono text-xs ${theme.textSecondary} py-4 text-center`}>
                     No other articles in this category yet.
                   </p>
                 ) : (
@@ -248,10 +266,18 @@ export default function BlogDetailPage({
                     {relatedBlogs.map((rel) => (
                       <div
                         key={rel.id}
-                        className="group p-3.5 rounded-xl border border-slate-800 bg-slate-950/50 hover:border-slate-700 transition-all flex flex-col justify-between"
+                        className={`group p-3.5 rounded-xl border ${theme.border} ${
+                           theme.mode === "light"
+                             ? "bg-white hover:border-slate-400"
+                             : "bg-slate-950/50 hover:border-slate-700"
+                         } transition-all flex flex-col justify-between`}
                       >
                         {rel.imageUrls && rel.imageUrls.length > 0 && (
-                          <div className="h-28 rounded-lg overflow-hidden mb-2.5 bg-slate-900 border border-slate-800/80">
+                          <div className={`h-28 rounded-lg overflow-hidden mb-2.5 border ${
+                             theme.mode === "light"
+                               ? "bg-slate-100 border-slate-300"
+                               : "bg-slate-900 border-slate-800/80"
+                           }`}>
                             <img
                               src={rel.imageUrls[0]}
                               alt={rel.title}
@@ -261,21 +287,29 @@ export default function BlogDetailPage({
                           </div>
                         )}
 
-                        <span className="text-[10px] font-mono text-slate-500 mb-1">
+                        <span className={`text-[10px] font-mono ${theme.textSecondary} mb-1`}>
                           {rel.manufacturer}
                         </span>
 
-                        <h4 className="font-bold text-xs line-clamp-2 leading-snug mb-2 group-hover:text-cyan-400 transition-colors">
+                        <h4 className={`font-bold text-xs line-clamp-2 leading-snug mb-2 transition-colors ${
+                           theme.mode === "light"
+                             ? "text-slate-900 group-hover:text-blue-700"
+                             : "group-hover:text-cyan-400"
+                         }`}>
                           {rel.title}
                         </h4>
 
-                        <p className="text-[11px] font-mono text-slate-400 line-clamp-2 mb-3">
+                        <p className={`text-[11px] font-mono ${theme.textSecondary} line-clamp-2 mb-3`}>
                           {rel.primaryUseCases}
                         </p>
 
                         <button
                           onClick={() => onSelectBlog(rel.id)}
-                          className="w-full py-1.5 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-cyan-400 text-xs font-mono font-medium transition-colors text-center"
+                          className={`w-full py-1.5 rounded-lg border text-xs font-mono font-medium transition-colors text-center ${
+                           theme.mode === "light"
+                             ? "border-slate-300 bg-slate-100 hover:bg-slate-200 text-blue-800"
+                             : "border-slate-700 bg-slate-900 hover:bg-slate-800 text-cyan-400"
+                         }`}
                         >
                           Read Full Blog →
                         </button>

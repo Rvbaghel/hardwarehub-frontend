@@ -178,7 +178,7 @@ export default function HardwareChatPage({
                 </div>
 
                 <div
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} bg-slate-900/60 font-mono text-xs`}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} ${theme.cardBg} font-mono text-xs`}
                 >
                   <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
                   <span className="font-semibold text-slate-200">
@@ -254,14 +254,24 @@ export default function HardwareChatPage({
                     onClick={() => handleSend(item.title)}
                     className={`p-4 rounded-xl border ${theme.border} ${theme.cardBg} hover:border-cyan-500/60 transition-all text-left group shadow-sm flex items-start gap-3`}
                   >
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-cyan-400 group-hover:scale-105 transition-transform">
+                    <div className={`p-2 rounded-lg border group-hover:scale-105 transition-transform ${
+                      theme.mode === "light"
+                        ? "bg-blue-50 border-blue-200 text-blue-700"
+                        : "bg-slate-900 border-slate-800 text-cyan-400"
+                    }`}>
                       <Icon className="h-4 w-4" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-xs text-slate-200 group-hover:text-cyan-300 transition-colors">
+                      <h4 className={`font-semibold text-xs transition-colors ${
+                        theme.mode === "light"
+                          ? "text-slate-900 group-hover:text-blue-700"
+                          : "text-slate-200 group-hover:text-cyan-300"
+                      }`}>
                         {item.title}
                       </h4>
-                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                      <p className={`text-[11px] font-mono mt-0.5 ${
+                        theme.mode === "light" ? "text-slate-600" : "text-slate-400"
+                      }`}>
                         {item.desc}
                       </p>
                     </div>
@@ -273,11 +283,13 @@ export default function HardwareChatPage({
         ) : (
           /* Active Chat Thread */
           <div className="space-y-6 pb-6">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800/80 text-[11px] font-mono text-slate-500">
+            <div className={`flex justify-between items-center pb-3 border-b ${theme.border} text-[11px] font-mono ${theme.textSecondary}`}>
               <span>HARDWAREHUB_AI_REASONING_STREAM</span>
               <button
                 onClick={() => setMessages([])}
-                className="flex items-center gap-1 hover:text-slate-300"
+                className={`flex items-center gap-1 ${
+                   theme.mode === "light" ? "text-slate-600 hover:text-slate-950" : "text-slate-400 hover:text-slate-200"
+                 }`}
               >
                 <RotateCcw className="h-3 w-3" /> Clear Screen
               </button>
@@ -311,23 +323,31 @@ export default function HardwareChatPage({
                         <p className="mb-2 last:mb-0 leading-relaxed" {...props} />
                       ),
                       ul: ({ node, ...props }) => (
-                        <ul className="list-disc pl-5 mb-3 space-y-1 text-slate-300" {...props} />
+                        <ul className={`list-disc pl-5 mb-3 space-y-1 ${theme.mode === "light" ? "text-slate-700" : "text-slate-300"}`} {...props} />
                       ),
                       ol: ({ node, ...props }) => (
-                        <ol className="list-decimal pl-5 mb-3 space-y-1 text-slate-300" {...props} />
+                        <ol className={`list-decimal pl-5 mb-3 space-y-1 ${theme.mode === "light" ? "text-slate-700" : "text-slate-300"}`} {...props} />
                       ),
                       li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
                       strong: ({ node, ...props }) => (
-                        <strong className="font-semibold text-cyan-300" {...props} />
+                        <strong className={`font-semibold ${theme.mode === "light" ? "text-blue-800" : "text-cyan-300"}`} {...props} />
                       ),
                       h3: ({ node, ...props }) => (
-                        <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-cyan-400 mt-4 mb-2" {...props} />
+                        <h3 className={`font-mono text-xs font-bold uppercase tracking-wider mt-4 mb-2 ${theme.mode === "light" ? "text-blue-800" : "text-cyan-400"}`} {...props} />
                       ),
                       code: ({ node, inline, ...props }) =>
                         inline ? (
-                          <code className="px-1.5 py-0.5 rounded bg-slate-900 text-cyan-300 font-mono text-xs border border-slate-800" {...props} />
+                          <code className={`px-1.5 py-0.5 rounded font-mono text-xs border ${
+                            theme.mode === "light"
+                              ? "bg-slate-100 text-blue-800 border-slate-300"
+                              : "bg-slate-900 text-cyan-300 border-slate-800"
+                          }`} {...props} />
                         ) : (
-                          <pre className="p-3 rounded-xl bg-slate-950 border border-slate-800 overflow-x-auto my-2 text-xs font-mono text-emerald-400" {...props} />
+                          <pre className={`p-3 rounded-xl border overflow-x-auto my-2 text-xs font-mono ${
+                            theme.mode === "light"
+                              ? "bg-slate-100 border-slate-300 text-emerald-800"
+                              : "bg-slate-950 border-slate-800 text-emerald-400"
+                          }`} {...props} />
                         ),
                     }}
                   >
@@ -345,7 +365,7 @@ export default function HardwareChatPage({
                   <Bot className="h-4 w-4 animate-spin" style={{ color: theme.dotColor }} />
                 </div>
                 <div
-                  className={`rounded-2xl rounded-tl-none p-4 ${theme.cardBg} border ${theme.border} text-xs font-mono text-slate-400 flex items-center gap-2.5`}
+                  className={`rounded-2xl rounded-tl-none p-4 ${theme.cardBg} border ${theme.border} text-xs font-mono ${theme.textSecondary} flex items-center gap-2.5`}
                 >
                   <span className="h-3.5 w-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
                   <span>Synthesizing logic specifications & voltage curves...</span>
@@ -391,7 +411,11 @@ export default function HardwareChatPage({
                       : "Sign in to query the silicon assistant..."
                   }
                   disabled={loading || quotaExhausted}
-                  className="w-full bg-transparent px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none"
+                  className={`w-full bg-transparent px-3 py-2 text-sm ${theme.textPrimary} ${
+                    theme.mode === "light"
+                      ? "placeholder:text-slate-500"
+                      : "placeholder:text-slate-500"
+                  } focus:outline-none`}
                 />
 
                 <button
@@ -404,7 +428,7 @@ export default function HardwareChatPage({
               </form>
             )}
           </div>
-          <p className="text-center text-[10px] font-mono text-slate-500 mt-2">
+          <p className={`text-center text-[10px] font-mono mt-2 ${theme.textSecondary}`}>
             HardwareHub AI can make mistakes. Always cross-reference manufacturer datasheets.
           </p>
         </div>
@@ -436,7 +460,11 @@ export default function HardwareChatPage({
               </button>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className="w-full py-2 rounded-lg border border-slate-800 text-xs font-mono text-slate-400 hover:text-slate-200"
+                className={`w-full py-2 rounded-lg border ${theme.border} text-xs font-mono ${
+                   theme.mode === "light"
+                     ? "text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                 }`}
               >
                 Explore Without AI
               </button>
@@ -454,10 +482,10 @@ export default function HardwareChatPage({
             <div className="h-12 w-12 mx-auto rounded-xl border border-amber-500/40 bg-amber-500/10 flex items-center justify-center mb-4 text-amber-400">
               <ShieldAlert className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-bold text-slate-100">
+            <h3 className={`text-lg font-bold ${theme.textPrimary}`}>
               Daily Limit Reached
             </h3>
-            <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            <p className={`text-xs ${theme.textSecondary} mt-2 leading-relaxed`}>
               You have completed all <strong>5 hardware reasoning requests</strong> for
               today. Your quota will automatically restore tomorrow at midnight.
             </p>

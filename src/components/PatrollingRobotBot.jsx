@@ -1,9 +1,8 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
-import { Sparkles, X, MessageSquareQuote } from "lucide-react";
+import { Sparkles, X } from "lucide-react";
 import { useTheme } from "../ThemeContext";
 
 /* -------------------------------------------------------------------------
@@ -160,14 +159,14 @@ export default function PatrollingRobotBot({ onOpenChat }) {
       <div
         role="status"
         aria-live="polite"
-        className={`relative mr-2 mb-2 max-w-[210px] rounded-2xl border ${theme.border} bg-slate-950/95 p-3 text-xs font-mono shadow-2xl backdrop-blur-md transition-all duration-300 ${
+        className={`relative mr-2 mb-2 max-w-[210px] rounded-2xl border ${theme.border} ${theme.cardBg} p-3 text-xs font-mono shadow-2xl backdrop-blur-md transition-all duration-300 ${
           isMessageVisible
             ? "translate-y-0 opacity-100 scale-100 pointer-events-auto"
             : "translate-y-3 opacity-0 scale-95 pointer-events-none"
         }`}
       >
         <div className="flex items-start justify-between gap-1 mb-1">
-          <span className="flex items-center gap-1 text-[10px] font-bold text-cyan-400">
+          <span className={`flex items-center gap-1 text-[10px] font-bold ${theme.textPrimary}`}>
             <Sparkles className="h-3 w-3" /> HardwareHub AI
           </span>
           {showBubble && !hovered && (
@@ -176,7 +175,7 @@ export default function PatrollingRobotBot({ onOpenChat }) {
                 e.stopPropagation();
                 setShowBubble(false);
               }}
-              className="text-slate-500 hover:text-slate-300 p-0.5"
+              className={`p-0.5 ${theme.textSecondary} hover:opacity-70`}
               aria-label="Close message"
             >
               <X className="h-3 w-3" />
@@ -184,12 +183,12 @@ export default function PatrollingRobotBot({ onOpenChat }) {
           )}
         </div>
 
-        <p className="text-slate-200 text-[11px] leading-relaxed font-sans">
+        <p className={`${theme.textPrimary} text-[11px] leading-relaxed font-sans">
           I'm HardwareHub AI, any need?
         </p>
 
         {/* Small arrow down to bot */}
-        <div className="absolute -bottom-1.5 right-8 h-3 w-3 rotate-45 border-r border-b border-slate-800 bg-slate-950" />
+        <div className={absolute -bottom-1.5 right-8 h-3 w-3 rotate-45 border-r border-b ${theme.border} ${theme.cardBg}`} />
       </div>
 
       {/* Clickable 3D Floating Avatar */}
@@ -199,7 +198,7 @@ export default function PatrollingRobotBot({ onOpenChat }) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
         aria-label="Open HardwareHub AI Chat"
-        className="relative h-28 w-28 cursor-pointer rounded-full border border-cyan-500/20 bg-slate-950/40 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-cyan-500/60 drop-shadow-[0_0_20px_rgba(6,182,212,0.25)] flex items-center justify-center group focus:outline-none"
+        className={`relative h-28 w-28 cursor-pointer rounded-full border ${theme.border} ${theme.cardBg} backdrop-blur-md transition-all duration-300 hover:scale-110 flex items-center justify-center group focus:outline-none`}
       >
         {/* Subtle pulsating glow halo */}
         <div
@@ -219,7 +218,7 @@ export default function PatrollingRobotBot({ onOpenChat }) {
         </div>
 
         {/* Online Status Dot Indicator */}
-        <div className="absolute bottom-1 right-2 flex items-center gap-1 rounded-full border border-slate-800 bg-slate-900/90 px-1.5 py-0.5 shadow-md">
+        <div className={`absolute bottom-1 right-2 flex items-center gap-1 rounded-full border ${theme.border} ${theme.cardBg} px-1.5 py-0.5 shadow-md`}>
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-[9px] font-mono text-emerald-400 font-bold">AI</span>
         </div>

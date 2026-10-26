@@ -207,7 +207,11 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
           <ThemeToggle />
           <button
             onClick={onNavigateHome}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors"
+            className={`text-xs font-mono transition-colors ${
+              theme.mode === "light"
+                ? "text-slate-600 hover:text-slate-950"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
           >
             Back to Home
           </button>
@@ -249,9 +253,11 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Username */}
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">USERNAME</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <User className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>USERNAME</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <User className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="text"
                     name="username"
@@ -259,16 +265,18 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="e.g. dev_vishal"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono`}
                   />
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">EMAIL ADDRESS</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <Mail className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>EMAIL ADDRESS</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <Mail className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="email"
                     name="email"
@@ -276,7 +284,7 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="vishal@embedded.io"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono`}
                   />
                 </div>
               </div>
@@ -285,9 +293,11 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
             {/* Passwords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">6-DIGIT PIN</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <KeyRound className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>6-DIGIT PIN</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <KeyRound className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="password"
                     name="password"
@@ -296,15 +306,17 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="123456"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono tracking-widest"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono tracking-widest`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">CONFIRM PIN</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <KeyRound className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>CONFIRM PIN</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <KeyRound className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="password"
                     name="confirmPassword"
@@ -313,7 +325,7 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="123456"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono tracking-widest"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono tracking-widest`}
                   />
                 </div>
               </div>
@@ -322,9 +334,11 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
             {/* Mobile & Age */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">MOBILE (10 DIGITS)</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <Phone className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>MOBILE (10 DIGITS)</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <Phone className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="tel"
                     name="mobileNumber"
@@ -333,15 +347,17 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="9876543210"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">AGE</label>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                  <Calendar className="h-4 w-4 text-slate-500" />
+                <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>AGE</label>
+                <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                     theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                   } focus-within:border-cyan-500`}>
+                  <Calendar className={`h-4 w-4 ${theme.textSecondary}`} />
                   <input
                     type="number"
                     name="age"
@@ -350,7 +366,7 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
                     onChange={handleChange}
                     required
                     placeholder="23"
-                    className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono"
+                    className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono`}
                   />
                 </div>
               </div>
@@ -358,16 +374,18 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
 
             {/* Bio */}
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">HARDWARE INTERESTS & BIO</label>
-              <div className={`flex items-start gap-2 p-3 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                <FileText className="h-4 w-4 text-slate-500 mt-0.5" />
+              <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>HARDWARE INTERESTS & BIO</label>
+              <div className={`flex items-start gap-2 p-3 rounded-lg border ${theme.border} ${
+                   theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                 } focus-within:border-cyan-500`}>
+                <FileText className={`h-4 w-4 ${theme.textSecondary} mt-0.5`} />
                 <textarea
                   name="bio"
                   rows={2}
                   value={formData.bio}
                   onChange={handleChange}
                   placeholder="e.g. Embedded developer focused on STM32, ESP32, and high-speed PCB interconnects."
-                  className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono resize-none"
+                  className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono resize-none`}
                 />
               </div>
             </div>
@@ -404,7 +422,9 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
           <button
             type="button"
             disabled
-            className={`w-full py-2.5 rounded-lg border ${theme.border} bg-slate-900/40 text-xs font-mono text-slate-400 flex items-center justify-center gap-3 cursor-not-allowed opacity-80`}
+            className={`w-full py-2.5 rounded-lg border ${theme.border} ${
+               theme.mode === "light" ? "bg-slate-100 text-slate-600" : "bg-slate-900/40 text-slate-400"
+             } text-xs font-mono flex items-center justify-center gap-3 cursor-not-allowed opacity-90`}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M12 5c1.54 0 2.93.56 4.02 1.48l3.01-3.01C17.21 1.79 14.77 1 12 1 7.48 1 3.66 3.6 1.84 7.39l3.66 2.84C6.38 7.33 8.95 5 12 5z" />
@@ -418,11 +438,11 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
             </span>
           </button>
 
-          <div className="mt-6 text-center text-xs font-mono text-slate-400">
+          <div className={`mt-6 text-center text-xs font-mono ${theme.textSecondary}`}>
             Already registered?{" "}
             <button
               onClick={onNavigateLogin}
-              className="text-cyan-400 hover:underline font-semibold"
+              className={`hover:underline font-semibold ${theme.mode === "light" ? "text-blue-700" : "text-cyan-400"}`}
             >
               Sign in to account
             </button>
@@ -430,8 +450,10 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
         </div>
 
         {/* Right Column: 3D Hardware Key */}
-        <div className={`lg:col-span-5 h-[460px] sm:h-[540px] rounded-2xl border ${theme.border} bg-slate-950/40 backdrop-blur-md overflow-hidden flex flex-col justify-between p-4 relative`}>
-          <div className="flex justify-between items-center text-xs font-mono text-slate-400 z-10">
+        <div className={`lg:col-span-5 h-[460px] sm:h-[540px] rounded-2xl border ${theme.border} ${
+            theme.mode === "light" ? "bg-slate-100" : "bg-slate-950/40"
+          } backdrop-blur-md overflow-hidden flex flex-col justify-between p-4 relative`}>
+          <div className={`flex justify-between items-center text-xs font-mono z-10 ${theme.textSecondary}`}>
             <span>SEC_KEY // FIDO2_HW</span>
             <span className="flex items-center gap-1.5 text-emerald-400">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
@@ -469,13 +491,13 @@ export default function SignupPage({ onNavigateLogin, onNavigateHome, onSignupSu
             </Canvas>
           </div>
 
-          <div className="z-10 text-center font-mono text-[11px] text-slate-500">
+          <div className={`z-10 text-center font-mono text-[11px] ${theme.textSecondary}`}>
             Hardware-grade cryptographic identity • Rotate key with cursor
           </div>
         </div>
       </main>
 
-      <footer className={`border-t ${theme.border} py-6 text-center text-xs text-slate-500 font-mono`}>
+      <footer className={`border-t ${theme.border} py-6 text-center text-xs ${theme.textSecondary} font-mono`}>
         &copy; {new Date().getFullYear()} HardwareHub. Encrypted identity layer via Spring Boot.
       </footer>
     </div>

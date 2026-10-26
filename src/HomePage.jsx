@@ -275,7 +275,7 @@ function SearchMonitor({ accentColor }) {
 const REAL_CATEGORIES = [
   { name: "Memory", queryKey: "MEMORY", icon: MemoryStick, desc: "DRAM, NAND, EEPROM & Flash" },
   { name: "Connectors", queryKey: "CONNECTORS", icon: Cable, desc: "USB-C, PCIe, Ribbon & Headers" },
-  { name: "Microcontrollers", queryKey: "MICROCONTROLLERS", icon: Cpu, desc: "ARM Cortex, ESP32 & MCUs" },
+  { name: "Chips & Microchips", queryKey: "CHIPS & MICROCHIPS", icon: Cpu, desc: "CPUs, GPUs, AI chips & semiconductor ICs" },
   { name: "Power Modules", queryKey: "POWER MODULES", icon: Zap, desc: "Buck converters, LDOs & Regulators" },
   { name: "Sensors", queryKey: "SENSORS", icon: Radio, desc: "IMUs, Environmental & Optical" },
 ];
@@ -354,9 +354,9 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
                 </button>
 
                 {/* Profile Badge */}
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} bg-slate-900/60 font-mono text-xs`}>
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} ${theme.cardBg} font-mono text-xs`}>
                   <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="font-semibold text-slate-200">@{currentUser.username}</span>
+                  <span className={`font-semibold ${theme.textPrimary}`}>@{currentUser.username}</span>
                 </div>
 
                 {/* Logout Button */}
@@ -429,7 +429,7 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
               {searchQuery && (
                 <button 
                   onClick={() => setSearchQuery("")}
-                  className="text-xs font-mono text-slate-400 hover:text-slate-200 px-2"
+                  className={`text-xs font-mono px-2 ${theme.mode === "light" ? "text-slate-600 hover:text-slate-950" : "text-slate-400 hover:text-slate-200"}`}
                 >
                   Clear
                 </button>
@@ -439,9 +439,9 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
 
           {/* 3D Canvas Box */}
           <div className={`relative h-[420px] sm:h-[480px] w-full rounded-2xl border ${theme.border} ${
-            theme.mode === "light" ? "bg-slate-900 shadow-xl" : "bg-slate-950/40 backdrop-blur-md"
+            theme.mode === "light" ? "bg-slate-100 shadow-xl" : "bg-slate-950/40 backdrop-blur-md"
           } overflow-hidden flex flex-col justify-between p-4`}>
-            <div className="flex justify-between items-center text-xs font-mono text-slate-400 z-10">
+            <div className={`flex justify-between items-center text-xs font-mono z-10 ${theme.textSecondary}`}>
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full animate-ping" style={{ backgroundColor: theme.dotColor }} />
                 SYSTEM // {isSearching ? "DOCUMENTATION_LOOKUP" : "BENCH_ASSEMBLY"}
@@ -473,7 +473,7 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
               </Canvas>
             </div>
 
-            <div className="z-10 text-center font-mono text-[11px] text-slate-400">
+            <div className={`z-10 text-center font-mono text-[11px] ${theme.textSecondary}`}>
               Click & drag to inspect work bay • Autonomous agent syncs live with documentation
             </div>
           </div>
@@ -509,7 +509,7 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
                   </div>
                   <h3 className="mt-4 font-semibold text-sm flex items-center justify-between">
                     {cat.name}
-                    {isSelected && <span className="text-[10px] text-cyan-400 font-mono">ACTIVE</span>}
+                    {isSelected && <span className={`text-[10px] font-mono ${theme.mode === "light" ? "text-cyan-800" : "text-cyan-400"}`}>ACTIVE</span>}
                   </h3>
                   <p className={`mt-1 text-xs ${theme.textSecondary}`}>{cat.desc}</p>
                 </div>
@@ -544,12 +544,12 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
           </div>
 
           {loadingBlogs ? (
-            <div className="text-center py-16 font-mono text-sm text-slate-500">
+            <div className={`text-center py-16 font-mono text-sm ${theme.textSecondary}`}>
               <span className="inline-block h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin mr-2" />
               Loading silicon records...
             </div>
           ) : filteredBlogs.length === 0 ? (
-            <div className={`p-12 rounded-2xl border ${theme.border} ${theme.cardBg} text-center font-mono text-sm text-slate-400`}>
+            <div className={`p-12 rounded-2xl border ${theme.border} ${theme.cardBg} text-center font-mono text-sm ${theme.textSecondary}`}>
               No hardware write-ups match this criteria. {currentUser ? "Publish the first article!" : "Sign up and write one!"}
             </div>
           ) : (
@@ -562,7 +562,7 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
                   <div>
                     {/* Primary Image preview */}
                     {blog.imageUrls && blog.imageUrls.length > 0 && (
-                      <div className="h-44 -mx-5 -mt-5 mb-4 overflow-hidden border-b border-slate-800 bg-slate-950">
+                      <div className={`h-44 -mx-5 -mt-5 mb-4 overflow-hidden border-b ${theme.border} ${theme.mode === "light" ? "bg-slate-100" : "bg-slate-950"}`}>
                         <img
                           src={blog.imageUrls[0]}
                           alt={blog.title}
@@ -574,10 +574,10 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
 
                     {/* Metadata Header */}
                     <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-500/10 text-cyan-400">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${theme.mode === "light" ? "border-cyan-700/30 bg-cyan-50 text-cyan-800" : "border-cyan-500/30 bg-cyan-500/10 text-cyan-400"}`}>
                         {blog.categoryName}
                       </span>
-                      <span className="text-[11px] font-mono text-slate-400">{blog.manufacturer}</span>
+                      <span className={`text-[11px] font-mono ${theme.textSecondary}`}>{blog.manufacturer}</span>
                     </div>
 
                     <h3 className="font-bold text-base leading-snug mb-2.5">{blog.title}</h3>
@@ -587,14 +587,14 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
                     </p>
 
                     {/* Primary Use Cases */}
-                    <div className="p-2.5 rounded-lg bg-slate-950/50 border border-slate-800/80 mb-4 text-[11px] font-mono text-slate-300">
-                      <span className="text-slate-500">Target Applications: </span>{blog.primaryUseCases}
+                    <div className={`p-2.5 rounded-lg mb-4 text-[11px] font-mono border ${theme.mode === "light" ? "bg-white border-slate-300 text-slate-700" : "bg-slate-950/50 border-slate-800/80 text-slate-300"}`}>
+                      <span className={theme.mode === "light" ? "text-slate-600" : "text-slate-400"}>Target Applications: </span>{blog.primaryUseCases}
                     </div>
                   </div>
                   {/* Read Full Blog Action Button */}
 <button
   onClick={() => onSelectBlog?.(blog.id)}
-  className={`w-full mb-3 py-2 rounded-lg border ${theme.border} bg-slate-900 hover:bg-slate-800 text-cyan-400 font-mono font-semibold text-xs transition-colors flex items-center justify-center gap-1.5`}
+  className={`w-full mb-3 py-2 rounded-lg border ${theme.border} ${theme.mode === "light" ? "bg-white hover:bg-slate-100 text-cyan-800" : "bg-slate-900 hover:bg-slate-800 text-cyan-400"} font-mono font-semibold text-xs transition-colors flex items-center justify-center gap-1.5`}
 >
   <span>Read Full Blog</span>
   <span>→</span>
@@ -602,7 +602,7 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
 
 
                   {/* Card Footer */}
-                  <div className="pt-3.5 border-t border-slate-800/80 flex items-center justify-between text-xs font-mono text-slate-400">
+                  <div className={`pt-3.5 border-t ${theme.border} flex items-center justify-between text-xs font-mono ${theme.textSecondary}`}>
                     <span className="flex items-center gap-1.5">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                       @{blog.authorUsername}
@@ -613,12 +613,12 @@ export default function HomePage({ onNavigateAuth, currentUser, onLogout,onSelec
                         href={blog.purchaseLink}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1 text-cyan-400 hover:underline font-semibold"
+                        className={`flex items-center gap-1 hover:underline font-semibold ${theme.mode === "light" ? "text-cyan-800" : "text-cyan-400"}`}
                       >
                         Buy Silicon <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
-                      <span className="text-slate-600">No Buy Link</span>
+                      <span className={theme.mode === "light" ? "text-slate-500" : "text-slate-600"}>No Buy Link</span>
                     )}
                   </div>
                 </article>

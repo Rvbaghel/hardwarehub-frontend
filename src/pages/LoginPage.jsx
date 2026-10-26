@@ -210,7 +210,11 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
           <ThemeToggle />
           <button
             onClick={onNavigateHome}
-            className="text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors"
+            className={`text-xs font-mono transition-colors ${
+              theme.mode === "light"
+                ? "text-slate-600 hover:text-slate-950"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
           >
             Back to Home
           </button>
@@ -251,9 +255,11 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">DEVELOPER EMAIL</label>
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                <Mail className="h-4 w-4 text-slate-500" />
+              <label className={`block text-xs font-mono mb-1 ${theme.textSecondary}`}>DEVELOPER EMAIL</label>
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                   theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                 } focus-within:border-cyan-500`}>
+                <Mail className={`h-4 w-4 ${theme.textSecondary}`} />
                 <input
                   type="email"
                   name="email"
@@ -261,7 +267,7 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
                   onChange={handleChange}
                   required
                   placeholder="admin@hardware.com"
-                  className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono"
+                  className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono`}
                 />
               </div>
             </div>
@@ -269,11 +275,13 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
             {/* 6-digit PIN */}
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-xs font-mono text-slate-400">6-DIGIT PIN</label>
-                <span className="text-[10px] font-mono text-slate-500">NUMERIC ONLY</span>
+                <label className={`block text-xs font-mono ${theme.textSecondary}`}>6-DIGIT PIN</label>
+                <span className={`text-[10px] font-mono ${theme.textSecondary}`}>NUMERIC ONLY</span>
               </div>
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} bg-slate-950/40 focus-within:border-cyan-500`}>
-                <KeyRound className="h-4 w-4 text-slate-500" />
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${theme.border} ${
+                   theme.mode === "light" ? "bg-white" : "bg-slate-950/40"
+                 } focus-within:border-cyan-500`}>
+                <KeyRound className={`h-4 w-4 ${theme.textSecondary}`} />
                 <input
                   type="password"
                   name="password"
@@ -282,7 +290,7 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
                   onChange={handleChange}
                   required
                   placeholder="••••••"
-                  className="w-full bg-transparent text-sm focus:outline-none placeholder:text-slate-600 font-mono tracking-widest"
+                  className={`w-full bg-transparent text-sm ${theme.textPrimary} focus:outline-none placeholder:text-slate-500 font-mono tracking-widest`}
                 />
               </div>
             </div>
@@ -319,7 +327,9 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
           <button
             type="button"
             disabled
-            className={`w-full py-2.5 rounded-lg border ${theme.border} bg-slate-900/40 text-xs font-mono text-slate-400 flex items-center justify-center gap-3 cursor-not-allowed opacity-80`}
+            className={`w-full py-2.5 rounded-lg border ${theme.border} ${
+              theme.mode === "light" ? "bg-slate-100 text-slate-600" : "bg-slate-900/40 text-slate-400"
+            } text-xs font-mono flex items-center justify-center gap-3 cursor-not-allowed opacity-90`}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M12 5c1.54 0 2.93.56 4.02 1.48l3.01-3.01C17.21 1.79 14.77 1 12 1 7.48 1 3.66 3.6 1.84 7.39l3.66 2.84C6.38 7.33 8.95 5 12 5z" />
@@ -333,11 +343,11 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
             </span>
           </button>
 
-          <div className="mt-6 text-center text-xs font-mono text-slate-400">
+          <div className={`mt-6 text-center text-xs font-mono ${theme.textSecondary}`}>
             Need an account?{" "}
             <button
               onClick={onNavigateSignup}
-              className="text-cyan-400 hover:underline font-semibold"
+              className={`hover:underline font-semibold ${theme.mode === "light" ? "text-blue-700" : "text-cyan-400"}`}
             >
               Create developer identity
             </button>
@@ -345,8 +355,10 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
         </div>
 
         {/* Right Column: 3D Secure Element Scanner (6 cols) */}
-        <div className={`lg:col-span-6 h-[460px] sm:h-[520px] rounded-2xl border ${theme.border} bg-slate-950/40 backdrop-blur-md overflow-hidden flex flex-col justify-between p-4 relative`}>
-          <div className="flex justify-between items-center text-xs font-mono text-slate-400 z-10">
+        <div className={`lg:col-span-6 h-[460px] sm:h-[520px] rounded-2xl border ${theme.border} ${
+            theme.mode === "light" ? "bg-slate-100" : "bg-slate-950/40"
+          } backdrop-blur-md overflow-hidden flex flex-col justify-between p-4 relative`}>
+          <div className={`flex justify-between items-center text-xs font-mono z-10 ${theme.textSecondary}`}>
             <span>SEC_ELEMENT // TPM_2.0</span>
             <span className="flex items-center gap-1.5 text-cyan-400">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-ping" />
@@ -389,13 +401,13 @@ export default function LoginPage({ onNavigateSignup, onNavigateHome, onLoginSuc
             </Canvas>
           </div>
 
-          <div className="z-10 text-center font-mono text-[11px] text-slate-500">
+          <div className={`z-10 text-center font-mono text-[11px] ${theme.textSecondary}`}>
             Encrypted hardware vault • Laser sweeps across die surface in real-time
           </div>
         </div>
       </main>
 
-      <footer className={`border-t ${theme.border} py-6 text-center text-xs text-slate-500 font-mono`}>
+      <footer className={`border-t ${theme.border} py-6 text-center text-xs ${theme.textSecondary} font-mono`}>
         &copy; {new Date().getFullYear()} HardwareHub. Encrypted identity layer via Spring Boot.
       </footer>
     </div>

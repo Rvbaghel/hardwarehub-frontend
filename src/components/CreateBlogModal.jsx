@@ -79,12 +79,19 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
       <div className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border ${theme.border} ${theme.cardBg} p-6 sm:p-8 backdrop-blur-md shadow-2xl transition-all`}>
         {/* Header */}
-        <div className="flex justify-between items-center pb-4 border-b border-slate-800">
+        <div className={`flex justify-between items-center pb-4 border-b ${theme.border}`}>
           <div className="flex items-center gap-2">
-            <Cpu className="h-5 w-5 text-cyan-400" />
+            <Cpu className={`h-5 w-5 ${theme.mode === "light" ? "text-blue-700" : "text-cyan-400"}`} />
             <h2 className="text-xl font-bold">Publish Hardware Write-up</h2>
           </div>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white">
+          <button
+            onClick={onClose}
+            className={`p-1 rounded-lg transition-colors ${
+              theme.mode === "light"
+                ? "hover:bg-slate-200 text-slate-600 hover:text-slate-950"
+                : "hover:bg-slate-800 text-slate-400 hover:text-white"
+            }`}
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -108,8 +115,8 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
         <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-xs font-mono">
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-slate-400">POST TITLE (10-120 CHARACTERS)</label>
-              <span className="text-slate-500">{formData.title.length}/120</span>
+              <label className={theme.textSecondary}>POST TITLE (10-120 CHARACTERS)</label>
+              <span className={theme.textSecondary}>{formData.title.length}/120</span>
             </div>
             <input
               type="text"
@@ -120,21 +127,29 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
               value={formData.title}
               onChange={handleChange}
               placeholder="e.g. ESP32-S3 Dual-Core Xtensa LX7 Overview & Pinout Analysis"
-              className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+              className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-400 mb-1">CATEGORY</label>
+              <label className={`block mb-1 ${theme.textSecondary}`}>CATEGORY</label>
               <select
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleChange}
-                className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+                className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
               >
                 {categories.map((c) => (
-                  <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                  <option
+                    key={c.id}
+                    value={c.id}
+                    className={theme.mode === "light" ? "bg-white text-slate-900" : "bg-slate-900 text-white"}
+                  >
                     {c.name}
                   </option>
                 ))}
@@ -142,7 +157,7 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
             </div>
 
             <div>
-              <label className="block text-slate-400 mb-1">MANUFACTURER</label>
+              <label className={`block mb-1 ${theme.textSecondary}`}>MANUFACTURER</label>
               <input
                 type="text"
                 name="manufacturer"
@@ -151,15 +166,17 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
                 value={formData.manufacturer}
                 onChange={handleChange}
                 placeholder="e.g. Espressif, Texas Instruments"
-                className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+                className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
               />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-slate-400">PRIMARY INDUSTRIAL USE CASES</label>
-              <span className="text-slate-500">{formData.primaryUseCases.length}/250</span>
+              <label className={theme.textSecondary}>PRIMARY INDUSTRIAL USE CASES</label>
+              <span className={theme.textSecondary}>{formData.primaryUseCases.length}/250</span>
             </div>
             <input
               type="text"
@@ -170,14 +187,16 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
               value={formData.primaryUseCases}
               onChange={handleChange}
               placeholder="e.g. Industrial Edge AI, Smart Home telemetry, USB OTG gateways"
-              className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+              className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
             />
           </div>
 
           <div>
             <div className="flex justify-between mb-1">
-              <label className="text-slate-400">TECHNICAL ARTICLE CONTENT (MIN 100 CHARS)</label>
-              <span className="text-slate-500">{formData.content.length}/10000</span>
+              <label className={theme.textSecondary}>TECHNICAL ARTICLE CONTENT (MIN 100 CHARS)</label>
+              <span className={theme.textSecondary}>{formData.content.length}/10000</span>
             </div>
             <textarea
               name="content"
@@ -187,44 +206,52 @@ export default function CreateBlogModal({ isOpen, onClose, onBlogCreated, curren
               value={formData.content}
               onChange={handleChange}
               placeholder="Deep dive into core architecture, registers, pin multiplexing, errata, voltage tolerances..."
-              className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500 font-mono`}
+              className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500 font-mono`}
             />
           </div>
 
           <div>
-            <label className="block text-slate-400 mb-1">DISTRIBUTOR / BUYER LINK (OPTIONAL)</label>
+            <label className={`block mb-1 ${theme.textSecondary}`}>DISTRIBUTOR / BUYER LINK (OPTIONAL)</label>
             <input
               type="url"
               name="purchaseLink"
               value={formData.purchaseLink}
               onChange={handleChange}
               placeholder="https://mouser.com/ProductDetail/..."
-              className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+              className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
             />
           </div>
 
           {/* Up to 2 Image URLs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-400 mb-1">IMAGE URL 1 (OPTIONAL)</label>
+              <label className={`block mb-1 ${theme.textSecondary}`}>IMAGE URL 1 (OPTIONAL)</label>
               <input
                 type="url"
                 name="image1"
                 value={formData.image1}
                 onChange={handleChange}
                 placeholder="https://images.unsplash.com/..."
-                className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+                className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
               />
             </div>
             <div>
-              <label className="block text-slate-400 mb-1">IMAGE URL 2 (OPTIONAL)</label>
+              <label className={`block mb-1 ${theme.textSecondary}`}>IMAGE URL 2 (OPTIONAL)</label>
               <input
                 type="url"
                 name="image2"
                 value={formData.image2}
                 onChange={handleChange}
                 placeholder="https://images.unsplash.com/..."
-                className={`w-full p-2.5 rounded-lg border ${theme.border} bg-slate-950/50 text-slate-100 focus:outline-none focus:border-cyan-500`}
+                className={`w-full p-2.5 rounded-lg border ${theme.border} ${
+                 theme.mode === "light" ? "bg-white text-slate-900 placeholder:text-slate-500" : "bg-slate-950/50 text-slate-100 placeholder:text-slate-500"
+               } focus:outline-none focus:border-cyan-500`}
               />
             </div>
           </div>
