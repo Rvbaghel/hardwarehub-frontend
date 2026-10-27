@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Cpu,
   ArrowLeft,
@@ -18,6 +19,8 @@ import {
   Lock
 } from "lucide-react";
 import { useTheme, ThemeToggle } from "../ThemeContext";
+
+const DAILY_LIMIT = 12;
 
 const STARTER_PROMPTS = [
   {
@@ -53,7 +56,7 @@ export default function HardwareChatPage({
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [quotaRemaining, setQuotaRemaining] = useState(5);
+  const [quotaRemaining, setQuotaRemaining] = useState(DAILY_LIMIT);
   const [quotaExhausted, setQuotaExhausted] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(!currentUser);
 
@@ -62,6 +65,42 @@ export default function HardwareChatPage({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  // Load the shared daily quota used by the chatbot, blog summaries, and comparisons.
+  useEffect(() => {
+    const userId = currentUser?.userId || currentUser?.id;
+
+    if (!userId) {
+      setQuotaRemaining(DAILY_LIMIT);
+      setQuotaExhausted(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadUsage = async () => {
+      try {
+        const response = await axios.get(
+          `https://hardwarehub-project.onrender.com/api/chat/usage?userId=${encodeURIComponent(userId)}`
+        );
+
+        if (cancelled) return;
+
+        const remaining = Number(response.data?.questionsRemaining ?? DAILY_LIMIT);
+        setQuotaRemaining(remaining);
+        setQuotaExhausted(remaining <= 0);
+      } catch (error) {
+        // Keep the current display if the usage endpoint is temporarily unavailable.
+        console.error("Could not load shared AI usage:", error);
+      }
+    };
+
+    loadUsage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUser?.userId, currentUser?.id]);
 
   const handleSend = async (customPrompt) => {
     const query = (customPrompt || input).trim();
@@ -102,7 +141,7 @@ export default function HardwareChatPage({
           ...prev,
           {
             sender: "bot",
-            text: "🛑 **Daily Quota Exhausted**: You have used all 5 of your daily queries. Your quota resets tomorrow at midnight.",
+            text: "🛑 **Daily Quota Exhausted**: You have used all 12 of your daily AI queries. Your quota resets tomorrow at midnight.",
           },
         ]);
       } else {
@@ -132,7 +171,7 @@ export default function HardwareChatPage({
           <div className="flex items-center gap-4">
             <button
               onClick={onBackHome}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${theme.border} text-xs font-mono hover:bg-slate-800/60 transition-colors`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border ${theme.border} text-xs font-mono transition-colors ${theme.mode === "light" ? "text-slate-700 bg-white hover:bg-slate-100" : "text-slate-200 bg-slate-900/60 hover:bg-slate-800/80"}`}
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>Exit Console</span>
@@ -172,8 +211,8 @@ export default function HardwareChatPage({
                   <Sparkles className="h-3.5 w-3.5" />
                   <span>
                     {quotaExhausted
-                      ? "0/5 Remaining"
-                      : `${quotaRemaining}/5 Questions`}
+                      ? "0/12 Remaining"
+                      : `${quotaRemaining}/12 Questions`}
                   </span>
                 </div>
 
@@ -181,7 +220,7 @@ export default function HardwareChatPage({
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border ${theme.border} ${theme.cardBg} font-mono text-xs`}
                 >
                   <UserCheck className="h-3.5 w-3.5 text-emerald-400" />
-                  <span className="font-semibold text-slate-200">
+                  <span className={`font-semibold ${theme.mode === "light" ? "text-slate-800" : "text-slate-200"}`}>
                     @{currentUser.username}
                   </span>
                 </div>
@@ -318,9 +357,16 @@ export default function HardwareChatPage({
                   }`}
                 >
                   <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
                     components={{
                       p: ({ node, ...props }) => (
-                        <p className="mb-2 last:mb-0 leading-relaxed" {...props} />
+                        <p className="mb-3 last:mb-0 leading-relaxed whitespace-normal" {...props} />
+                      ),
+                      h1: ({ node, ...props }) => (
+                        <h1 className={`text-xl font-bold mt-5 mb-3 ${theme.mode === "light" ? "text-slate-950" : "text-white"}`} {...props} />
+                      ),
+                      h2: ({ node, ...props }) => (
+                        <h2 className={`text-lg font-bold mt-5 mb-3 ${theme.mode === "light" ? "text-slate-950" : "text-white"}`} {...props} />
                       ),
                       ul: ({ node, ...props }) => (
                         <ul className={`list-disc pl-5 mb-3 space-y-1 ${theme.mode === "light" ? "text-slate-700" : "text-slate-300"}`} {...props} />
@@ -335,6 +381,15 @@ export default function HardwareChatPage({
                       h3: ({ node, ...props }) => (
                         <h3 className={`font-mono text-xs font-bold uppercase tracking-wider mt-4 mb-2 ${theme.mode === "light" ? "text-blue-800" : "text-cyan-400"}`} {...props} />
                       ),
+                      hr: () => <hr className={`my-4 ${theme.mode === "light" ? "border-slate-300" : "border-slate-700"}`} />,
+                      table: ({ node, ...props }) => (
+                        <div className={`my-4 w-full overflow-x-auto rounded-lg border ${theme.border}`}><table className="w-full min-w-[520px] border-collapse text-left text-xs sm:text-sm" {...props} /></div>
+                      ),
+                      thead: ({ node, ...props }) => <thead className={theme.mode === "light" ? "bg-slate-100 text-slate-900" : "bg-slate-900 text-slate-100"} {...props} />,
+                      tbody: ({ node, ...props }) => <tbody className={theme.mode === "light" ? "divide-y divide-slate-200" : "divide-y divide-slate-700"} {...props} />,
+                      tr: ({ node, ...props }) => <tr className={theme.mode === "light" ? "border-b border-slate-200" : "border-b border-slate-700"} {...props} />,
+                      th: ({ node, ...props }) => <th className="px-3 py-2 font-semibold whitespace-nowrap" {...props} />,
+                      td: ({ node, ...props }) => <td className={`px-3 py-2 align-top ${theme.mode === "light" ? "text-slate-700" : "text-slate-300"}`} {...props} />,
                       code: ({ node, inline, ...props }) =>
                         inline ? (
                           <code className={`px-1.5 py-0.5 rounded font-mono text-xs border ${
@@ -386,11 +441,11 @@ export default function HardwareChatPage({
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>
-                    Daily quota of 5 questions exhausted. Refreshes tomorrow.
+                    Daily quota of 12 AI requests exhausted. Refreshes tomorrow.
                   </span>
                 </div>
                 <span className="text-[10px] text-slate-500">
-                  LIMIT: 5/DAY
+                  LIMIT: 12/DAY
                 </span>
               </div>
             ) : (
@@ -486,7 +541,7 @@ export default function HardwareChatPage({
               Daily Limit Reached
             </h3>
             <p className={`text-xs ${theme.textSecondary} mt-2 leading-relaxed`}>
-              You have completed all <strong>5 hardware reasoning requests</strong> for
+              You have completed all <strong>12 shared AI requests</strong> for
               today. Your quota will automatically restore tomorrow at midnight.
             </p>
 

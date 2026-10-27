@@ -11,7 +11,14 @@ import {
   Sparkles, 
   Calendar, 
   Building2, 
-  Compass 
+  Compass,
+  FileText,
+  GitCompare,
+  LoaderCircle,
+  X,
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown
 } from "lucide-react";
 import { useTheme, ThemeToggle } from "../ThemeContext";
 
@@ -28,6 +35,239 @@ export default function BlogDetailPage({
   const [blog, setBlog] = useState(null);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Blog AI tools: summary and hardware comparison.
+  const [activeAiFeature, setActiveAiFeature] = useState(null);
+  const [aiResults, setAiResults] = useState({ summary: "", compare: "" });
+  const [aiLoading, setAiLoading] = useState({ summary: false, compare: false });
+  const [aiErrors, setAiErrors] = useState({ summary: "", compare: "" });
+  const [usedAiFeatures, setUsedAiFeatures] = useState({ summary: false, compare: false });
+  const [questionsRemaining, setQuestionsRemaining] = useState(12);
+  const [aiPanelExpanded, setAiPanelExpanded] = useState(true);
+
+  const API_BASE_URL = "https://hardwarehub-project.onrender.com";
+
+  const getCurrentUserId = () =>
+    currentUser?.id ?? currentUser?.userId ?? currentUser?.user_id ?? null;
+
+  const runBlogAiFeature = async (feature) => {
+    if (!blog?.id || !currentUser) {
+      setAiErrors((previous) => ({
+        ...previous,
+        [feature]: "Please sign in to use this AI feature."
+      }));
+      setActiveAiFeature(feature);
+      return;
+    }
+
+    if (usedAiFeatures[feature]) {
+      setAiErrors((previous) => ({
+        ...previous,
+        [feature]: "You have already used this feature for this blog."
+      }));
+      setActiveAiFeature(feature);
+      return;
+    }
+
+    const userId = getCurrentUserId();
+    if (userId == null) {
+      setAiErrors((previous) => ({
+        ...previous,
+        [feature]: "Your user ID is missing. Please sign out and sign in again."
+      }));
+      setActiveAiFeature(feature);
+      return;
+    }
+
+    setActiveAiFeature(feature);
+    setAiPanelExpanded(true);
+    setAiLoading((previous) => ({ ...previous, [feature]: true }));
+    setAiErrors((previous) => ({ ...previous, [feature]: "" }));
+    setAiResults((previous) => ({ ...previous, [feature]: "" }));
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/blog-ai/${blog.id}/${feature}`,
+        { userId: String(userId) }
+      );
+
+      const result = response?.data?.result;
+      if (!result || typeof result !== "string") {
+        throw new Error("The AI service returned an empty response. Please try again.");
+      }
+
+      setAiResults((previous) => ({ ...previous, [feature]: result }));
+      setUsedAiFeatures((previous) => ({ ...previous, [feature]: true }));
+
+      if (typeof response.data.questionsRemaining === "number") {
+        setQuestionsRemaining(response.data.questionsRemaining);
+      }
+    } catch (error) {
+      const status = error?.response?.status;
+      const serverMessage = error?.response?.data?.message || error?.response?.data?.error;
+
+      let message = serverMessage || error.message || "Unable to generate an AI response.";
+      if (status === 401) {
+        message = "Please sign in to use this AI feature.";
+      } else if (status === 404) {
+        message = "This blog or AI endpoint was not found. Confirm that the latest backend is deployed.";
+      } else if (status === 409) {
+        message = "You have already used this feature for this blog.";
+        setUsedAiFeatures((previous) => ({ ...previous, [feature]: true }));
+      } else if (status === 429) {
+        message = "Your daily AI request limit has been reached. Please try again tomorrow.";
+      }
+
+      if (typeof error?.response?.data?.questionsRemaining === "number") {
+        setQuestionsRemaining(error.response.data.questionsRemaining);
+      }
+
+      setAiErrors((previous) => ({ ...previous, [feature]: message }));
+    } finally {
+      setAiLoading((previous) => ({ ...previous, [feature]: false }));
+    }
+  };
+
+  // Render Gemini's Markdown response (headings, lists, bold text, and tables)
+  // without requiring an additional frontend dependency.
+  const renderAiMarkdown = (markdown) => {
+    const lines = String(markdown || "").replace(/\r/g, "").split("\n");
+    const elements = [];
+    let paragraph = [];
+    let listItems = [];
+    let listType = null;
+    let tableRows = [];
+
+    const inlineFormat = (text, keyPrefix) => {
+      const pieces = String(text).split(/(\*\*.*?\*\*|`[^`]+`|\*[^*]+\*)/g);
+      return pieces.map((piece, index) => {
+        if (piece.startsWith("**") && piece.endsWith("**")) {
+          return <strong key={`${keyPrefix}-b-${index}`}>{piece.slice(2, -2)}</strong>;
+        }
+        if (piece.startsWith("`") && piece.endsWith("`")) {
+          return <code key={`${keyPrefix}-c-${index}`} className={`rounded px-1 py-0.5 text-[0.9em] ${theme.mode === "light" ? "bg-slate-200 text-slate-900" : "bg-slate-800 text-cyan-200"}`}>{piece.slice(1, -1)}</code>;
+        }
+        if (piece.startsWith("*") && piece.endsWith("*")) {
+          return <em key={`${keyPrefix}-i-${index}`}>{piece.slice(1, -1)}</em>;
+        }
+        return piece;
+      });
+    };
+
+    const flushParagraph = () => {
+      if (paragraph.length) {
+        elements.push(
+          <p key={`p-${elements.length}`} className="mb-3 leading-7">
+            {inlineFormat(paragraph.join(" "), `p-${elements.length}`)}
+          </p>
+        );
+        paragraph = [];
+      }
+    };
+
+    const flushList = () => {
+      if (listItems.length) {
+        const ListTag = listType === "ol" ? "ol" : "ul";
+        elements.push(
+          <ListTag key={`list-${elements.length}`} className={`${listType === "ol" ? "list-decimal" : "list-disc"} mb-4 space-y-1 pl-6`}>
+            {listItems.map((item, index) => (
+              <li key={`li-${index}`}>{inlineFormat(item, `li-${elements.length}-${index}`)}</li>
+            ))}
+          </ListTag>
+        );
+        listItems = [];
+        listType = null;
+      }
+    };
+
+    const flushTable = () => {
+      if (tableRows.length) {
+        const rows = tableRows.filter((row) => !/^\s*\|?\s*:?-{3,}/.test(row));
+        const parsedRows = rows.map((row) =>
+          row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim())
+        );
+        if (parsedRows.length) {
+          elements.push(
+            <div key={`table-${elements.length}`} className="mb-4 max-w-full overflow-x-auto rounded-lg border border-slate-500/30">
+              <table className="w-full min-w-[480px] border-collapse text-left text-xs sm:text-sm">
+                <thead className={theme.mode === "light" ? "bg-slate-100" : "bg-slate-800/80"}>
+                  <tr>
+                    {parsedRows[0].map((cell, index) => (
+                      <th key={`th-${index}`} className="border-b border-slate-500/30 px-3 py-2 font-semibold">
+                        {inlineFormat(cell, `th-${index}`)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {parsedRows.slice(1).map((row, rowIndex) => (
+                    <tr key={`tr-${rowIndex}`} className={rowIndex % 2 === 0 ? (theme.mode === "light" ? "bg-white" : "bg-slate-900/30") : (theme.mode === "light" ? "bg-slate-50" : "bg-slate-800/30")}>
+                      {row.map((cell, cellIndex) => (
+                        <td key={`td-${rowIndex}-${cellIndex}`} className="border-b border-slate-500/20 px-3 py-2 align-top">
+                          {inlineFormat(cell, `td-${rowIndex}-${cellIndex}`)}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+        tableRows = [];
+      }
+    };
+
+    lines.forEach((rawLine) => {
+      const line = rawLine.trim();
+      const isTableLine = line.includes("|") && /^\|?.+\|.+/.test(line);
+      if (isTableLine) {
+        flushParagraph();
+        flushList();
+        tableRows.push(line);
+        return;
+      }
+      flushTable();
+
+      if (!line) {
+        flushParagraph();
+        flushList();
+        return;
+      }
+
+      const headingMatch = line.match(/^(#{1,4})\s+(.+)$/);
+      if (headingMatch) {
+        flushParagraph();
+        flushList();
+        const level = headingMatch[1].length;
+        const headingClass = level === 1 ? "text-lg sm:text-xl" : level === 2 ? "text-base sm:text-lg" : "text-sm sm:text-base";
+        elements.push(
+          <h3 key={`h-${elements.length}`} className={`${headingClass} mb-2 mt-4 font-bold text-cyan-500`}>
+            {inlineFormat(headingMatch[2].replace(/\*\*/g, ""), `h-${elements.length}`)}
+          </h3>
+        );
+        return;
+      }
+
+      const bulletMatch = line.match(/^[-*•]\s+(.+)$/);
+      const orderedMatch = line.match(/^\d+[.)]\s+(.+)$/);
+      if (bulletMatch || orderedMatch) {
+        flushParagraph();
+        const nextType = orderedMatch ? "ol" : "ul";
+        if (listType && listType !== nextType) flushList();
+        listType = nextType;
+        listItems.push((bulletMatch || orderedMatch)[1]);
+        return;
+      }
+
+      paragraph.push(line);
+    });
+
+    flushParagraph();
+    flushList();
+    flushTable();
+    return elements;
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -323,6 +563,133 @@ export default function BlogDetailPage({
         )}
       </main>
 
+      {/* Floating AI tools dock — kept separate from the main article and chatbot */}
+      <div className="fixed bottom-5 right-4 sm:right-6 z-[60] flex w-[calc(100vw-2rem)] max-w-[390px] flex-col items-end gap-3">
+        {activeAiFeature && (
+          <section
+            className={`w-full overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-xl transition-all ${
+              theme.mode === "light"
+                ? "border-slate-300 bg-white/95 text-slate-900"
+                : "border-slate-700 bg-slate-950/95 text-slate-100"
+            }`}
+            aria-label={activeAiFeature === "summary" ? "AI blog summary" : "AI hardware comparison"}
+          >
+            <div className={`flex items-center justify-between gap-3 border-b px-4 py-3 ${theme.border}`}>
+              <div className="flex min-w-0 items-center gap-2">
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${theme.mode === "light" ? "bg-violet-100 text-violet-700" : "bg-violet-500/15 text-violet-300"}`}>
+                  {activeAiFeature === "summary" ? <FileText className="h-4 w-4" /> : <GitCompare className="h-4 w-4" />}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="truncate text-sm font-bold">
+                    {activeAiFeature === "summary" ? "AI Blog Summary" : "Hardware Comparison"}
+                  </h3>
+                  <p className={`text-[10px] ${theme.textSecondary}`}>Gemini-powered hardware assistant</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveAiFeature(null)}
+                className={`rounded-lg p-1.5 transition-colors ${theme.mode === "light" ? "hover:bg-slate-100" : "hover:bg-slate-800"}`}
+                aria-label="Close AI result"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="max-h-[min(55vh,460px)] overflow-y-auto px-4 py-4 text-sm">
+              {aiLoading[activeAiFeature] ? (
+                <div className="flex flex-col items-center justify-center gap-3 py-10 text-center">
+                  <div className="relative flex h-14 w-14 items-center justify-center">
+                    <span className="absolute inset-0 rounded-full border-2 border-violet-400/30 border-t-violet-500 animate-spin" />
+                    <Sparkles className="h-6 w-6 animate-pulse text-violet-400" />
+                  </div>
+                  <p className="font-semibold">
+                    {activeAiFeature === "summary" ? "Summarizing this blog..." : "Comparing hardware alternatives..."}
+                  </p>
+                  <p className={`text-xs ${theme.textSecondary}`}>Gemini is analyzing the component details.</p>
+                </div>
+              ) : aiErrors[activeAiFeature] ? (
+                <div className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${theme.mode === "light" ? "border-red-200 bg-red-50 text-red-700" : "border-red-500/30 bg-red-500/10 text-red-300"}`}>
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <p>{aiErrors[activeAiFeature]}</p>
+                </div>
+              ) : aiResults[activeAiFeature] ? (
+                <div className="break-words">
+                  {renderAiMarkdown(aiResults[activeAiFeature])}
+                  {usedAiFeatures[activeAiFeature] && (
+                    <p className={`mt-4 flex items-center gap-1.5 border-t pt-3 text-[11px] ${theme.border} ${theme.textSecondary}`}>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                      This feature has been used for this blog.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className={`py-5 text-center text-sm ${theme.textSecondary}`}>
+                  Select an AI tool below to analyze this hardware article.
+                </p>
+              )}
+            </div>
+          </section>
+        )}
+
+        <div className={`w-full rounded-2xl border p-3 shadow-2xl backdrop-blur-xl ${theme.border} ${theme.mode === "light" ? "bg-white/95" : "bg-slate-950/95"}`}>
+          <button
+            type="button"
+            onClick={() => setAiPanelExpanded((expanded) => !expanded)}
+            className="mb-2 flex w-full items-center justify-between gap-2 px-1"
+            aria-expanded={aiPanelExpanded}
+          >
+            <span className="flex items-center gap-2 text-xs font-semibold">
+              <span className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500/20 to-cyan-500/20 text-violet-400">
+                <Sparkles className="h-4 w-4" />
+                <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-slate-950" />
+              </span>
+              Hardware AI Tools
+            </span>
+            <span className={`flex items-center gap-1 text-[11px] ${theme.textSecondary}`}>
+              {questionsRemaining} queries left
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${aiPanelExpanded ? "rotate-180" : ""}`} />
+            </span>
+          </button>
+
+          {aiPanelExpanded && (
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => runBlogAiFeature("summary")}
+                disabled={aiLoading.summary || usedAiFeatures.summary}
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                  theme.mode === "light"
+                    ? "border-violet-200 bg-violet-50 text-violet-800 hover:bg-violet-100"
+                    : "border-violet-500/30 bg-violet-500/10 text-violet-200 hover:bg-violet-500/20"
+                }`}
+              >
+                {aiLoading.summary ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                <span>{usedAiFeatures.summary ? "Summary used" : "Summarize blog"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => runBlogAiFeature("compare")}
+                disabled={aiLoading.compare || usedAiFeatures.compare}
+                className={`flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
+                  theme.mode === "light"
+                    ? "border-cyan-200 bg-cyan-50 text-cyan-800 hover:bg-cyan-100"
+                    : "border-cyan-500/30 bg-cyan-500/10 text-cyan-200 hover:bg-cyan-500/20"
+                }`}
+              >
+                {aiLoading.compare ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <GitCompare className="h-4 w-4" />}
+                <span>{usedAiFeatures.compare ? "Comparison used" : "Compare hardware"}</span>
+              </button>
+            </div>
+          )}
+          {!currentUser && (
+            <p className={`mt-2 text-center text-[10px] ${theme.textSecondary}`}>
+              Sign in to use the AI tools.
+            </p>
+          )}
+        </div>
+      </div>
+
       {/* 3. Footer */}
       <footer className={`border-t ${theme.border} py-8 text-center text-xs ${theme.textSecondary} font-mono transition-colors`}>
         &copy; {new Date().getFullYear()} HardwareHub. Technical write-up view.
@@ -330,3 +697,5 @@ export default function BlogDetailPage({
     </div>
   );
 }
+
+
